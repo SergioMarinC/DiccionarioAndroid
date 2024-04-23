@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Diccionario</string>
+    <string name="introducirModificar">Introducir/Modificar</string>
+    <string name="consultas">Consultas</string>
+    <string name="test">Test</string>
+    <string name="EsPalabra">Palabra</string>
+    <string name="Guardar">Guardar</string>
+    <string name="Eliminar">Eliminar\n</string>
+</resources>
