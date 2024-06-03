@@ -98,6 +98,7 @@ public class IntroducirModificar extends AppCompatActivity implements RecyclerVi
 
         Button btnGuardar = popupView.findViewById(R.id.btnGuardar);
         Button btnEliminar = popupView.findViewById(R.id.btnEliminar);
+        //TODO Hay que gestionar o crear un método para que actualice la entrada y cree una nueva.
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
