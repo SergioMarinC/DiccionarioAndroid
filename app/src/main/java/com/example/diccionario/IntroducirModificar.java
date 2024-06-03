@@ -1,6 +1,7 @@
 package com.example.diccionario;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -118,7 +119,7 @@ public class IntroducirModificar extends AppCompatActivity implements RecyclerVi
         btnEliminar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Log.d("Delete", "Valor de entrada: " + entradaSeleccionada.toString());
                 ControladorEntrada.eliminarEntrada(entradaSeleccionada);
                 adaptadorRecyclerView.notifyDataSetChanged();
                 popupWindow.dismiss();

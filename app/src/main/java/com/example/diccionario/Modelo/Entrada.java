@@ -12,6 +12,7 @@ public class Entrada {
     private LocalDateTime fechaDeIntroduccion;
     private LocalDateTime ultimoTestRealizado;
     private int numeroDeAciertos;
+    private int id;
 
     public  Entrada(String espanol, String ingles, boolean esPalabra){
         this.espanol = espanol;
@@ -25,7 +26,7 @@ public class Entrada {
         this.numeroDeAciertos = 0;
     }
 
-    public Entrada(String espanol, String ingles, boolean esPalabra, String sonido, int numeroDeAciertos) {
+    /*public Entrada(String espanol, String ingles, boolean esPalabra, String sonido, int numeroDeAciertos) {
         this.espanol = espanol;
         this.ingles = ingles;
         this.esPalabra = esPalabra;
@@ -35,9 +36,9 @@ public class Entrada {
         }
         this.ultimoTestRealizado = null;
         this.numeroDeAciertos = numeroDeAciertos;
-    }
+    }*/
 
-    public Entrada(String espanol, String ingles, boolean esPalabra, String sonido, LocalDateTime fechaDeIntroduccion, LocalDateTime ultimoTestRealizado, int numeroDeAciertos) {
+    public Entrada(String espanol, String ingles, boolean esPalabra, String sonido, LocalDateTime fechaDeIntroduccion, LocalDateTime ultimoTestRealizado, int numeroDeAciertos, int id) {
         this.espanol = espanol;
         this.ingles = ingles;
         this.esPalabra = esPalabra;
@@ -45,10 +46,14 @@ public class Entrada {
         this.fechaDeIntroduccion = fechaDeIntroduccion;
         this.ultimoTestRealizado = ultimoTestRealizado;
         this.numeroDeAciertos = numeroDeAciertos;
+        this.id =  id;
     }
 
     public String getEspanol() {
         return espanol;
+    }
+    public Integer getId(){
+        return id;
     }
 
     public void setEspanol(String espanol) {
@@ -101,5 +106,19 @@ public class Entrada {
 
     public void setNumeroDeAciertos(int numeroDeAciertos) {
         this.numeroDeAciertos = numeroDeAciertos;
+    }
+
+    @Override
+    public String toString() {
+        return "Entrada{" +
+                "espanol='" + espanol + '\'' +
+                ", ingles='" + ingles + '\'' +
+                ", esPalabra=" + esPalabra +
+                ", sonido='" + sonido + '\'' +
+                ", fechaDeIntroduccion=" + fechaDeIntroduccion +
+                ", ultimoTestRealizado=" + ultimoTestRealizado +
+                ", numeroDeAciertos=" + numeroDeAciertos +
+                ", id=" + id +
+                '}';
     }
 }

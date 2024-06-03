@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ControladorEntrada.init();
+        ControladorEntrada.init(this);
 
         Button btnIntroducirModificar = findViewById(R.id.btnIntroducirModificar);
         btnIntroducirModificar.setOnClickListener(new View.OnClickListener() {

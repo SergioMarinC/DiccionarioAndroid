@@ -1,19 +1,27 @@
 package com.example.diccionario.DAO;
 
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
+import android.util.Log;
 
 import com.example.diccionario.Modelo.Entrada;
+import com.example.diccionario.SQLite.DBHandler;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class DaoEntrada {
 
-    private ArrayList<Entrada> entradas = new ArrayList<Entrada>();
+    DBHandler dbHandler;
 
-    public DaoEntrada(){
+    public DaoEntrada(Context context){
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        dbHandler = new DBHandler(context);
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             entradas.add(new Entrada("Hola", "Hello", true, "hola.wav", LocalDateTime.of(2023, 4, 10, 10, 30), null, 0));
             entradas.add(new Entrada("Adiós", "Goodbye", true, "adios.wav", LocalDateTime.of(2023, 4, 10, 10, 35), null, 0));
             entradas.add(new Entrada("Gato", "Cat", true, "gato.wav", LocalDateTime.of(2023, 4, 10, 10, 40), null, 0));
@@ -43,16 +51,108 @@ public class DaoEntrada {
             entradas.add(new Entrada("Cuchara", "Spoon", true, "cuchara.wav", LocalDateTime.now(), null, 0));
             entradas.add(new Entrada("Servilleta", "Napkin", true, "servilleta.wav", LocalDateTime.now(), null, 0));
             entradas.add(new Entrada("Plato", "Plate", true, "plato.wav", LocalDateTime.now(), null, 0));
-            entradas.add(new Entrada("Vaso", "Glass", true, "vaso.wav", LocalDateTime.now(), null, 0));
+            entradas.add(new Entrada("Vaso", "Glass", true, "vaso.wav", LocalDateTime.now(), null, 0));*/
         }
 
+    //Añadir entrada a la base de datos
+    public void addEntrada(Entrada entrada){
+        //Abre conexión de escritura con la base de datos
+        SQLiteDatabase db = dbHandler.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        //Se añaden los valores correspondientes a las tabla
+        String espanolValue = entrada.getEspanol();
+        Log.d("DB_INSERT", "Valor de espanol: " + espanolValue);
+        values.put(DBHandler.ESPANOL_COL, espanolValue);
+
+        String inglesValue = entrada.getIngles();
+        Log.d("DB_INSERT", "Valor de ingles: " + inglesValue);
+        values.put(DBHandler.INGLES_COL, inglesValue);
+
+        boolean esPalabraValue = entrada.isEsPalabra();
+        Log.d("DB_INSERT", "Valor de esPalabra: " + esPalabraValue);
+        values.put(DBHandler.ESPALABRA_COL, esPalabraValue);
+
+        String sonidoValue = entrada.getSonido();
+        Log.d("DB_INSERT", "Valor de sonido: " + sonidoValue);
+        values.put(DBHandler.SONIDO_COL, sonidoValue);
+
+        String fechaDeIntroduccionValue = entrada.getFechaDeIntroduccion().toString();
+        Log.d("DB_INSERT", "Valor de fechaDeIntroduccion: " + fechaDeIntroduccionValue);
+        if (entrada.getFechaDeIntroduccion() != null) {
+            values.put(DBHandler.FECHADEINTRODUCCION_COL, entrada.getFechaDeIntroduccion().toString());
+        } else {
+            // Si fechaDeIntroduccion es nulo, asignarle la fecha y hora actual
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                entrada.setFechaDeIntroduccion(LocalDateTime.now());
+            }
+            values.put(DBHandler.FECHADEINTRODUCCION_COL, entrada.getFechaDeIntroduccion().toString());
+        }
+
+        if (entrada.getUltimoTestRealizado() != null) {
+            values.put(DBHandler.ULTIMOTESTREALIZADO_COL, entrada.getUltimoTestRealizado().toString());
+        } else {
+            values.putNull(DBHandler.ULTIMOTESTREALIZADO_COL);
+        }
+
+        int numeroDeAciertosValue = entrada.getNumeroDeAciertos();
+        Log.d("DB_INSERT", "Valor de numeroDeAciertos: " + numeroDeAciertosValue);
+        values.put(DBHandler.NUMERODEACIERTOS_COL, numeroDeAciertosValue);
+
+        //Realiza un insert de los valores
+        db.insert(DBHandler.TABLE_NAME, null, values);
+
+        //Cierra conexión
+        db.close();
     }
 
-    public ArrayList<Entrada> getEntradas() {
-        return entradas;
+    //Borrado de Entrada
+    public void deleteEntrada(int id) {
+        SQLiteDatabase db = dbHandler.getWritableDatabase();
+        //Colección de string para evitar problemas con la inyección. Además, se convierte el int a String
+        db.delete(DBHandler.TABLE_NAME, DBHandler.ID_COL + " = ?", new String[]{String.valueOf(id)});
+        db.close();
     }
 
-    public void setEntradas(ArrayList entradas) {
-        this.entradas = entradas;
+    public ArrayList<Entrada> getAllEntradas(){
+        ArrayList<Entrada> entradas = new ArrayList<>();
+        SQLiteDatabase db = dbHandler.getWritableDatabase();
+        Cursor cursor = db.query(DBHandler.TABLE_NAME, null, null, null, null, null, null);
+
+        //Comprueba la primera fila
+        //Luego hace un do while que obtiene datos hasta que se no haya más
+        //tod esto lo añade a un array
+        if (cursor.moveToFirst()) {
+            DateTimeFormatter formatter = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+            }
+            do {
+                String espanol = cursor.getString(cursor.getColumnIndexOrThrow(DBHandler.ESPANOL_COL));
+                String ingles = cursor.getString(cursor.getColumnIndexOrThrow(DBHandler.INGLES_COL));
+                boolean esPalabra = cursor.getInt(cursor.getColumnIndexOrThrow(DBHandler.ESPALABRA_COL)) == 1;
+                String sonido = cursor.getString(cursor.getColumnIndexOrThrow(DBHandler.SONIDO_COL));
+                String fechaDeIntroduccionStr = cursor.getString(cursor.getColumnIndexOrThrow(DBHandler.FECHADEINTRODUCCION_COL));
+                String ultimoTestRealizadoStr = cursor.getString(cursor.getColumnIndexOrThrow(DBHandler.ULTIMOTESTREALIZADO_COL));
+                int numeroDeAciertos = cursor.getInt(cursor.getColumnIndexOrThrow(DBHandler.NUMERODEACIERTOS_COL));
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(DBHandler.ID_COL));
+
+                LocalDateTime fechaDeIntroduccion = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    fechaDeIntroduccion = LocalDateTime.parse(fechaDeIntroduccionStr, formatter);
+                }
+                LocalDateTime ultimoTestRealizado = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    ultimoTestRealizado = ultimoTestRealizadoStr != null ? LocalDateTime.parse(ultimoTestRealizadoStr, formatter) : null;
+                }
+
+                Entrada entrada = new Entrada(espanol, ingles, esPalabra, sonido, fechaDeIntroduccion, ultimoTestRealizado, numeroDeAciertos, id);
+                entradas.add(entrada);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return  entradas;
     }
 }
