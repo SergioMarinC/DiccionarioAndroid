@@ -28,4 +28,8 @@ public class ControladorEntrada {
     public static void eliminarEntrada(Entrada entradaEliminar){
         daoEntrada.deleteEntrada(entradaEliminar.getId());
     }
+
+    public static void actualizarEntrada(Entrada entradaModificar){
+        daoEntrada.updateEntrada(entradaModificar);
+    }
 }

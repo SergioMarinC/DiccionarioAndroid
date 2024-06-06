@@ -114,6 +114,37 @@ public class DaoEntrada {
         db.close();
     }
 
+    //Actualizar Entrada
+    public void updateEntrada(Entrada entrada){
+        SQLiteDatabase db = dbHandler.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(DBHandler.ESPANOL_COL, entrada.getEspanol());
+        values.put(DBHandler.INGLES_COL, entrada.getIngles());
+        values.put(DBHandler.ESPALABRA_COL, entrada.isEsPalabra());
+        values.put(DBHandler.SONIDO_COL, entrada.getSonido());
+
+        if (entrada.getFechaDeIntroduccion() != null) {
+            values.put(DBHandler.FECHADEINTRODUCCION_COL, entrada.getFechaDeIntroduccion().toString());
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                entrada.setFechaDeIntroduccion(LocalDateTime.now());
+            }
+            values.put(DBHandler.FECHADEINTRODUCCION_COL, entrada.getFechaDeIntroduccion().toString());
+        }
+
+        if (entrada.getUltimoTestRealizado() != null) {
+            values.put(DBHandler.ULTIMOTESTREALIZADO_COL, entrada.getUltimoTestRealizado().toString());
+        } else {
+            values.putNull(DBHandler.ULTIMOTESTREALIZADO_COL);
+        }
+
+        values.put(DBHandler.NUMERODEACIERTOS_COL, entrada.getNumeroDeAciertos());
+
+        db.update(DBHandler.TABLE_NAME, values, DBHandler.ID_COL + " = ?", new String[]{String.valueOf(entrada.getId())});
+        db.close();
+    }
+
     public ArrayList<Entrada> getAllEntradas(){
         ArrayList<Entrada> entradas = new ArrayList<>();
         SQLiteDatabase db = dbHandler.getWritableDatabase();

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 public class IntroducirModificar extends AppCompatActivity implements RecyclerViewInterface{
 
     private AdaptadorRecyclerView adaptadorRecyclerView;
+    private ArrayList<Entrada> listadoEntradas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +39,8 @@ public class IntroducirModificar extends AppCompatActivity implements RecyclerVi
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         FloatingActionButton fabAgregarEntrada = findViewById(R.id.fabAgregarEntrada);
 
-        adaptadorRecyclerView = new AdaptadorRecyclerView(this, ControladorEntrada.getEntradas(), this);
+        listadoEntradas = ControladorEntrada.getEntradas();
+        adaptadorRecyclerView = new AdaptadorRecyclerView(this, listadoEntradas, this);
         recyclerView.setAdapter(adaptadorRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -64,11 +66,11 @@ public class IntroducirModificar extends AppCompatActivity implements RecyclerVi
                     @Override
                     public void onClick(View v) {
 
+                        //Duda, realizar consulta para obtener de nuevo las entradas o añadir con un add
                         ControladorEntrada.agregarEntrada(new Entrada(editTextEspanol.getText().toString(), editTextIngles.getText().toString(), checkBoxEsPalabra.isChecked()));
-
-                        // Notificar al adaptador que los datos han cambiado
-                        adaptadorRecyclerView.notifyDataSetChanged();
-
+                        listadoEntradas.clear();
+                        listadoEntradas.addAll(ControladorEntrada.getEntradas());
+                        adaptadorRecyclerView.notifyItemInserted(listadoEntradas.size() -1);
                         // Cerrar el PopupWindow
                         popupWindow.dismiss();
                     }
@@ -109,9 +111,13 @@ public class IntroducirModificar extends AppCompatActivity implements RecyclerVi
                 entradaSeleccionada.setEspanol(nuevaPalabra);
                 entradaSeleccionada.setIngles(nuevaTraduccion);
                 entradaSeleccionada.setEsPalabra(checkBoxEsPalabra.isChecked());
+                entradaSeleccionada.setSonido(nuevaPalabra+".wav");
 
+                ControladorEntrada.actualizarEntrada(entradaSeleccionada);
                 // Notificar al adaptador que los datos han cambiado
-                adaptadorRecyclerView.notifyDataSetChanged();
+                listadoEntradas.clear();
+                listadoEntradas.addAll(ControladorEntrada.getEntradas());
+                adaptadorRecyclerView.notifyItemChanged(posicion);
 
                 // Cerrar el PopupWindow
                 popupWindow.dismiss();
@@ -122,7 +128,9 @@ public class IntroducirModificar extends AppCompatActivity implements RecyclerVi
             public void onClick(View v) {
                 Log.d("Delete", "Valor de entrada: " + entradaSeleccionada.toString());
                 ControladorEntrada.eliminarEntrada(entradaSeleccionada);
-                adaptadorRecyclerView.notifyDataSetChanged();
+                listadoEntradas.clear();
+                listadoEntradas.addAll(ControladorEntrada.getEntradas());
+                adaptadorRecyclerView.notifyItemRemoved(listadoEntradas.size());
                 popupWindow.dismiss();
             }
         });
