@@ -18,38 +18,45 @@ import java.util.ArrayList;
 
 public class AdaptadorRecyclerView extends RecyclerView.Adapter<AdaptadorRecyclerView.MyViewHolder> {
 
-    private  final RecyclerViewInterface recyclerViewInterface;
+    private final RecyclerViewInterface recyclerViewInterface; // Interfaz para manejar eventos de clic
     private Context context;
-    private ArrayList<Entrada> entradas;
+    private ArrayList<Entrada> entradas; // Lista de entradas a mostrar
 
-    public AdaptadorRecyclerView(Context context, ArrayList<Entrada> entradas, RecyclerViewInterface recyclerViewInterface){
-
+    // Constructor del adaptador
+    public AdaptadorRecyclerView(Context context, ArrayList<Entrada> entradas, RecyclerViewInterface recyclerViewInterface) {
         this.context = context;
         this.entradas = entradas;
         this.recyclerViewInterface = recyclerViewInterface;
     }
 
+    // Método llamado cuando se necesita crear una nueva vista para un elemento de la lista
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.item_recycler_view, parent, false);
-        return new AdaptadorRecyclerView.MyViewHolder(view, recyclerViewInterface);
+        View view = inflater.inflate(R.layout.item_recycler_view, parent, false); // Inflar el layout del elemento de la lista
+        return new MyViewHolder(view, recyclerViewInterface); // Devolver una instancia de MyViewHolder
     }
 
+    // Método llamado para mostrar datos en una posición específica
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-
-        holder.txtEspanol.setText(entradas.get(position).getEspanol());
-        holder.txtIngles.setText(entradas.get(position).getIngles());
+        // Obtener la entrada en la posición dada
+        Entrada entrada = entradas.get(position);
+        // Establecer los datos en los elementos de la vista (item)
+        holder.txtEspanol.setText(entrada.getEspanol());
+        holder.txtIngles.setText(entrada.getIngles());
+        // Aquí podrías cargar imágenes u otros datos necesarios
     }
 
+    // Método que devuelve el número total de elementos en la lista
     @Override
     public int getItemCount() {
         return entradas.size();
     }
 
-    public static class MyViewHolder extends  RecyclerView.ViewHolder{
+    // Clase interna para representar cada elemento de la lista
+    public static class MyViewHolder extends RecyclerView.ViewHolder {
 
         ImageView imageViewEspana, imageViewReinoUnido;
         TextView txtEspanol, txtIngles;
@@ -57,26 +64,28 @@ public class AdaptadorRecyclerView extends RecyclerView.Adapter<AdaptadorRecycle
         public MyViewHolder(@NonNull View itemView, RecyclerViewInterface recyclerViewInterface) {
             super(itemView);
 
+            // Obtener referencias a los elementos de la vista (item)
             imageViewEspana = itemView.findViewById(R.id.imageViewEspana);
             imageViewReinoUnido = itemView.findViewById(R.id.imageViewReinoUnido);
             txtEspanol = itemView.findViewById(R.id.txtEspanol);
-            txtIngles= itemView.findViewById(R.id.txtIngles);
+            txtIngles = itemView.findViewById(R.id.txtIngles);
 
-            //Añadir listener al item
+            // Añadir un listener al item de la lista
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (recyclerViewInterface != null){
-
+                    // Verificar si la interfaz está inicializada y no es nula
+                    if (recyclerViewInterface != null) {
+                        // Obtener la posición del elemento clicado
                         int pos = getAdapterPosition();
-
-                        if (pos != RecyclerView.NO_POSITION){
+                        // Verificar si la posición es válida
+                        if (pos != RecyclerView.NO_POSITION) {
+                            // Llamar al método onItemClick definido en la interfaz, pasando la posición
                             recyclerViewInterface.onItemClick(pos);
                         }
                     }
                 }
             });
-
         }
     }
 }
